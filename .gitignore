@@ -5,5 +5,9 @@
 # IDE project files
 /.idea
 
+# TeleportHQ
+/ui/components
+/ui/package.json
+
 # wip
 /icons
