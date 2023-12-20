@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Disk Eater</title>
-    <meta property="og:title" content="Disk Eater" />
+    <title>Eater - Disk Eater</title>
+    <meta property="og:title" content="Eater - Disk Eater" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="utf-8" />
     <meta property="twitter:card" content="summary_large_image" />
@@ -78,62 +78,32 @@
       }
     </style>
 
-    <script src="js/rive.js"></script>
     <script src="js/disk.js"></script>
   </head>
   <body>
     <link rel="stylesheet" href="./style.css" />
     <div>
-      <link href="./index.css" rel="stylesheet" />
+      <link href="./eater.css" rel="stylesheet" />
 
-      <div class="loader-container">
-        <div class="loader-body">
-          <div class="loader-container1">
-            <div>
-              <div class="loader-container3">
-                <canvas id="canvas-rive-loader"></canvas>
-              </div>
-            </div>
+      <div class="eater-container">
+        <div class="eater-body">
+          <div class="eater-panel">
+            <button type="button" class="eater-button button">Start</button>
+            <div class="eater-spacer"></div>
+            <button type="button" class="eater-button1 button">Wipe</button>
           </div>
-          <span class="loader-text">Getting system info, please wait...</span>
-        </div>
-        <div>
-          <div class="loader-container5">
-            <script>
-              const invoke = window.__TAURI_INTERNALS__.invoke;
+          <div id="disk-list" class="eater-disk-list">
 
-              const layout = new rive.Layout({
-                fit: rive.Fit.FitWidth, // Change to: rive.Fit.Contain, or Cover
-                alignment: rive.Alignment.Center,
-              });
-
-              const riveCanvas = document.getElementById('canvas-rive-loader')
-
-              const riveInstance = new rive.Rive({
-                src: 'rive/loader.riv',
-                stateMachines: 'SM BoxLoader',
-                canvas: riveCanvas,
-                layout: layout,
-                autoplay: true,
-                onLoad: () => {
-                  riveInstance.resizeDrawingSurfaceToCanvas();
-                }
-              });
-
-              async function getSystemInfo() {
-                try {
-                  await getDiskInfo();
-                  window.location.href = 'eater.html';
-                } catch (e) {
-                  alert(`[ERROR] ${e}`);
-                }
-              }
-
-              setTimeout(getSystemInfo, 2000);
-            </script>
           </div>
         </div>
       </div>
     </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', main);
+
+      function main() {
+        addDisksToPage();
+      }
+    </script>
   </body>
 </html>
