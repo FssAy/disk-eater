@@ -1,13 +1,9 @@
 use super::*;
-use sysinfo::{RefreshKind, System, SystemExt};
+use sysinfo::{SystemExt};
 
 #[tauri::command]
 pub fn get_disk_info() -> Vec<Disk> {
-    let mut sys = System::new_with_specifics(
-        RefreshKind::new()
-            .with_disks()
-            .with_disks_list()
-    );
+    let mut sys = create_disk_system();
 
     sys.refresh_disks();
 

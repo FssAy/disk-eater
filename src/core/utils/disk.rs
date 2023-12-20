@@ -1,4 +1,4 @@
-use sysinfo::DiskExt;
+use sysinfo::{DiskExt, RefreshKind, System, SystemExt};
 use crate::core::utils::{GetDiskLetter, OsStringConv};
 
 #[derive(Serialize)]
@@ -21,4 +21,12 @@ impl From<&sysinfo::Disk> for Disk {
             space_now: disk.available_space(),
         }
     }
+}
+
+pub fn create_disk_system() -> System {
+    System::new_with_specifics(
+        RefreshKind::new()
+            .with_disks()
+            .with_disks_list()
+    )
 }

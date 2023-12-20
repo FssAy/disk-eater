@@ -39,7 +39,24 @@ function addDisksToPage() {
         }
     }
 
-    // ToDo: add listener
+    window.__TAURI__.event.listen('disk_update', diskListenerCallback);
+    window.__TAURI_INTERNALS__.invoke('spawn_disk_listener', { window: window.__TAURI__.window });
+}
+
+function diskListenerCallback(data) {
+    const diskMin = data.payload;
+    const id = diskMin.id;
+
+    window.diskMap[id].spaceNow = diskMin.spaceNow;
+    const disk = window.diskMap[id];
+
+    let eID = document.getElementById(`disk-letter-${id}`);
+    let eProgressText = document.getElementById(`disk-progress-text-${id}`);
+    let eProgressBar = document.getElementById(`disk-progress-${id}`);
+
+    eID.innerText = `${id}:`;
+    eProgressText.innerText = makeDiskText(disk);
+    eProgressBar.style.setProperty('width', `${calculateUsedSpace(disk.spaceNow, disk.spaceMax)}%`, 'important');
 }
 
 function formatBytes(bytes, decimals = 2) {
@@ -61,6 +78,10 @@ function calculateUsedSpace(availableSpace, totalSize) {
     return Math.ceil(usedPercentage);
 }
 
+function makeDiskText(disk) {
+    return `[${formatBytes(disk.spaceNow)}] of [${formatBytes(disk.spaceMax)}] Free`;
+}
+
 function makeDiskHtml(id) {
     const disk = window.diskMap[id];
 
@@ -68,8 +89,7 @@ function makeDiskHtml(id) {
         return;
     }
 
-    const diskSpaceText = `[${formatBytes(disk.spaceNow)}] of [${formatBytes(disk.spaceMax)}] Free`;
-
+    const diskSpaceText = makeDiskText(disk);
     const usedSpace = calculateUsedSpace(disk.spaceNow, disk.spaceMax);
 
     return `
@@ -80,7 +100,7 @@ function makeDiskHtml(id) {
   <div class="eater-space-bar">
     <div class="eater-space-bar-text">
       <div class="eater-text-background">
-        <span class="eater-text1">${diskSpaceText}</span>
+        <span id="disk-progress-text-${id}" class="eater-text1">${diskSpaceText}</span>
       </div>
     </div>
     <div id="disk-progress-${id}" class="eater-space-bar-value" style="width: ${usedSpace}% !important;"></div>
