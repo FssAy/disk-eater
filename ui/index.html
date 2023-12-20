@@ -64,6 +64,7 @@
         <div>
           <div class="loader-container5">
             <script>
+              const invoke = window.__TAURI_INTERNALS__.invoke;
 
               const layout = new rive.Layout({
                 fit: rive.Fit.FitWidth, // Change to: rive.Fit.Contain, or Cover
@@ -82,6 +83,17 @@
                   riveInstance.resizeDrawingSurfaceToCanvas();
                 }
               });
+
+              async function getSystemInfo() {
+                try {
+                  const disks = await invoke('get_disk_info');
+                  console.log(disks);
+                } catch (e) {
+                  alert(`[ERROR] ${e}`);
+                }
+              }
+
+              setTimeout(getSystemInfo, 2000);
             </script>
           </div>
         </div>
