@@ -2,6 +2,7 @@ use sysinfo::DiskExt;
 use crate::core::utils::{GetDiskLetter, OsStringConv};
 
 #[derive(Serialize)]
+#[serde(rename_all="camelCase")]
 pub struct Disk {
     name: String,
     mount: Option<char>,
