@@ -14,6 +14,7 @@
   --dl-size-size-xlarge: 192px;
   --dl-size-size-xsmall: 16px;
   --dl-space-space-unit: 16px;
+  --dl-color-aespak-ship: #5e38baff;
   --dl-color-primary-100: #003EB3;
   --dl-color-primary-300: #0074F0;
   --dl-color-primary-500: #14A9FF;
@@ -34,10 +35,13 @@
   --dl-space-space-fiveunits: 80px;
   --dl-space-space-fourunits: 64px;
   --dl-space-space-threeunits: 48px;
+  --dl-color-aespak-background: #dddaf2ff;
+  --dl-color-aespak-ship-light: #6c4dceff;
   --dl-space-space-oneandhalfunits: 24px;
 }
 .button {
   color: var(--dl-color-gray-black);
+  cursor: pointer;
   display: inline-block;
   padding: 0.5rem 1rem;
   border-color: var(--dl-color-gray-black);

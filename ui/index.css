@@ -1,27 +1,27 @@
 .loader-container {
   width: 100%;
   display: flex;
-  overflow: auto;
+  overflow: hidden;
   min-height: 100vh;
   align-items: center;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   background-color: var(--dl-color-app-background);
 }
 .loader-body {
-  gap: var(--dl-space-space-fourunits);
-  flex: 1;
-  width: 100%;
+  width: 600px;
+  height: 600px;
   display: flex;
+  overflow: hidden;
   align-items: center;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
 }
 .loader-container1 {
-  flex: 0 0 auto;
   width: 500px;
   height: 500px;
   display: flex;
+  overflow: hidden;
   align-items: center;
   justify-content: center;
 }
@@ -30,11 +30,16 @@
 }
 .loader-text {
   color: var(--dl-color-app-loader);
+  width: 100%;
   font-size: 24px;
   font-style: normal;
+  margin-top: var(--dl-space-space-unit);
   text-align: center;
   font-weight: 300;
   line-height: 2;
+  padding-left: var(--dl-space-space-oneandhalfunits);
+  margin-bottom: var(--dl-space-space-unit);
+  padding-right: var(--dl-space-space-oneandhalfunits);
   letter-spacing: 2.5px;
   text-transform: uppercase;
 }
