@@ -117,8 +117,8 @@
         }
 
         if (window.isEating) {
-          changeBtnName('Start');
           await window.__TAURI_INTERNALS__.invoke('stop_disk_eater');
+          changeBtnName('Start');
         } else {
           try {
             const ids = getIDs();
@@ -128,10 +128,11 @@
               return;
             }
 
-            changeBtnName('Stop');
             await window.__TAURI_INTERNALS__.invoke('spawn_disk_eater', { ids: ids });
+            changeBtnName('Stop');
           } catch (e) {
             alert(`[ERROR] ${e}`);
+            return;
           }
         }
 
