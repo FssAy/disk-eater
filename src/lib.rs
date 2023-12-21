@@ -9,7 +9,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             core::get_disk_info,
             core::spawn_disk_listener,
+            core::spawn_disk_eater,
             core::stop_disk_listener,
+            core::stop_disk_eater,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

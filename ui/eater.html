@@ -88,9 +88,9 @@
       <div class="eater-container">
         <div class="eater-body">
           <div class="eater-panel">
-            <button type="button" class="eater-button button">Start</button>
+            <button id="btn-toggle" type="button" class="eater-button button" onclick="toggleEater()">Start</button>
             <div class="eater-spacer"></div>
-            <button type="button" class="eater-button1 button">Wipe</button>
+            <button type="button" class="eater-button1 button" disabled>Wipe</button>
           </div>
           <div id="disk-list" class="eater-disk-list">
 
@@ -101,8 +101,63 @@
     <script>
       document.addEventListener('DOMContentLoaded', main);
 
+      window.isEating = false;
+
       function main() {
         addDisksToPage();
+      }
+
+      async function toggleEater() {
+        if (window.isEating) {
+          changeBtnName('Start');
+          await window.__TAURI_INTERNALS__.invoke('stop_disk_eater');
+        } else {
+          try {
+            const ids = getIDs();
+
+            if (ids.length <= 0) {
+              alert(`Select at least one Disk!`);
+              return;
+            }
+
+            changeBtnName('Stop');
+            await window.__TAURI_INTERNALS__.invoke('spawn_disk_eater', { ids: ids });
+          } catch (e) {
+            alert(`[ERROR] ${e}`);
+          }
+        }
+
+        const newIsEating = !window.isEating;
+
+        disableCheckBoxes(newIsEating);
+        window.isEating = newIsEating;
+      }
+
+      function getIDs() {
+        const allIDs = Object.keys(window.diskMap);
+        let checkedIDs = [];
+
+        for (const id of allIDs) {
+          let eCheckBox = document.getElementById(`disk-check-${id}`);
+          if (eCheckBox && eCheckBox.checked) {
+            checkedIDs.push(id);
+          }
+        }
+
+        return checkedIDs
+      }
+
+      function changeBtnName(text) {
+        document.getElementById('btn-toggle').innerText = text;
+      }
+
+      function disableCheckBoxes(val) {
+        for (const id of Object.keys(window.diskMap)) {
+          let eCheckBox = document.getElementById(`disk-check-${id}`);
+          if (eCheckBox) {
+            eCheckBox.disabled = val;
+          }
+        }
       }
     </script>
   </body>
