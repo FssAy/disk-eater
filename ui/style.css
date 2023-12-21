@@ -40,6 +40,9 @@
   --dl-color-aespak-ship-light: #6c4dceff;
   --dl-space-space-oneandhalfunits: 24px;
 }
+body {
+  background-color: var(--dl-color-app-background);
+}
 .button {
   color: var(--dl-color-gray-black);
   cursor: pointer;
