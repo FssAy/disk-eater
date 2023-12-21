@@ -47,14 +47,14 @@ pub fn spawn_disk_eater(window: Window, ids: Vec<char>) -> Result<(), String> {
             .open(path)
             .map_err(|e| e.to_string())?;
 
-        files.push((id, file));
+        files.push(file);
     }
 
     RUN_EATER.store(true, Ordering::SeqCst);
 
     let window = Arc::new(window);
 
-    for (id, file) in files {
+    for file in files {
         let runner = Arc::new(&RUN_EATER);
 
         let window = Arc::clone(&window);
