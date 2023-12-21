@@ -4,18 +4,14 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
-use std::thread::sleep;
-use std::time::Duration;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use super::*;
 
 static RUN_EATER: AtomicBool = AtomicBool::new(false);
 
-const BUFFER_SIZE: usize = 1_000_000;
-const FILE_REFRESH_SIZE: usize = 50_000_000;
-
-type Buffer = [u8; BUFFER_SIZE];
+const BUFFER_SIZE: usize = 100_000_000;
+const FILE_REFRESH_SIZE: usize = 500_000_000;
 
 #[tauri::command]
 pub fn stop_disk_eater() {
@@ -60,25 +56,37 @@ pub fn spawn_disk_eater(ids: Vec<char>) -> Result<(), String> {
 
         thread::spawn(move || {
             let mut file = file;
-            let mut rng = SmallRng::from_entropy();
-            let mut buffer = [0u8; BUFFER_SIZE];
             let mut file_size_state = 0;
+            let mut file_size_refresh = FILE_REFRESH_SIZE;
 
-            while runner.load(Ordering::SeqCst) {
+            let mut buffer = vec![0u8; BUFFER_SIZE];
+            let mut buffer_cap_size = BUFFER_SIZE;
+
+            let mut rng = SmallRng::from_entropy();
+
+            while runner.load(Ordering::SeqCst) && buffer_cap_size > 0 {
+                let mut buffer = &mut buffer[..buffer_cap_size];
+
                 match file_filler(&mut file, &mut buffer, &mut rng) {
                     Some(size) => file_size_state += size,
-                    None => break,
+                    None => {
+                        /*
+                            ToDo: run this code only when there is no more space on disk
+                            for other error -> break
+                        */
+                        file_size_refresh = 0;
+                        buffer_cap_size /= 2;
+                        continue;
+                    },
                 }
 
-                if file_size_state >= FILE_REFRESH_SIZE {
+                if file_size_state >= file_size_refresh {
                     if file.sync_all().is_err() {
                         break;
                     }
 
                     file_size_state = 0;
                 }
-
-                sleep(Duration::from_millis(100));
             }
 
             if Arc::strong_count(&runner) <= 1 {
@@ -90,8 +98,12 @@ pub fn spawn_disk_eater(ids: Vec<char>) -> Result<(), String> {
     Ok(())
 }
 
-fn file_filler(file: &mut File, buffer: &mut Buffer, rng: &mut SmallRng) -> Option<usize> {
-    let buffer = buffer as &mut [u8];
+fn file_filler(file: &mut File, buffer: &mut [u8], rng: &mut SmallRng) -> Option<usize> {
     rng.fill(buffer);
-    file.write(&buffer).ok()
+    let result = file.write(&buffer);
+
+    // clear
+    let _ = buffer.fill(0);
+
+    result.ok()
 }
