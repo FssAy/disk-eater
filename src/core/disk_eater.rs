@@ -6,6 +6,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
+use tauri::{Manager, Window};
 use super::*;
 
 static RUN_EATER: AtomicBool = AtomicBool::new(false);
@@ -19,7 +20,7 @@ pub fn stop_disk_eater() {
 }
 
 #[tauri::command]
-pub fn spawn_disk_eater(ids: Vec<char>) -> Result<(), String> {
+pub fn spawn_disk_eater(window: Window, ids: Vec<char>) -> Result<(), String> {
     if RUN_EATER.load(Ordering::SeqCst) {
         return Err("eater is already running".to_string());
     }
@@ -46,14 +47,17 @@ pub fn spawn_disk_eater(ids: Vec<char>) -> Result<(), String> {
             .open(path)
             .map_err(|e| e.to_string())?;
 
-        files.push(file);
+        files.push((id, file));
     }
 
     RUN_EATER.store(true, Ordering::SeqCst);
 
-    for file in files {
+    let window = Arc::new(window);
+
+    for (id, file) in files {
         let runner = Arc::new(&RUN_EATER);
 
+        let window = Arc::clone(&window);
         thread::spawn(move || {
             let mut file = file;
             let mut file_size_state = 0;
@@ -91,6 +95,7 @@ pub fn spawn_disk_eater(ids: Vec<char>) -> Result<(), String> {
 
             if Arc::strong_count(&runner) <= 1 {
                 runner.store(false, Ordering::SeqCst);
+                send_finish_signal(window.as_ref());
             }
         });
     }
@@ -106,4 +111,11 @@ fn file_filler(file: &mut File, buffer: &mut [u8], rng: &mut SmallRng) -> Option
     let _ = buffer.fill(0);
 
     result.ok()
+}
+
+fn send_finish_signal(window: &Window) {
+    window.emit(
+        "eating_finished",
+        None::<()>,
+    ).ok();
 }

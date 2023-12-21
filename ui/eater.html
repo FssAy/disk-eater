@@ -105,9 +105,17 @@
 
       function main() {
         addDisksToPage();
+
+        window.__TAURI__.event.listen('eating_finished', async () => {
+          await toggleEater(false);
+        });
       }
 
-      async function toggleEater() {
+      async function toggleEater(forceState) {
+        if (forceState != null) {
+          window.isEating = !forceState;
+        }
+
         if (window.isEating) {
           changeBtnName('Start');
           await window.__TAURI_INTERNALS__.invoke('stop_disk_eater');
